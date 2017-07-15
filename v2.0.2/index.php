@@ -24,7 +24,7 @@
 				<li class="list-group-item">
 					<?php if ( $conf['show_reportedhash'] == '0' ) { ?>Mined<span class="pull-right">&Xi;<?=$stat['unpaid']?></span> <?php } ?>
 					<?php if ( $conf['show_reportedhash'] == '1' ) { ?>Reported Hashrate<span class="pull-right"><?=$stat['reportedhashrate']?> MH/s</span> <?php } ?>
-				</li>				
+				</li>
 				<li class="list-group-item">Effective Hashrate [60 mins]	<span class="pull-right"><?=$stat['hashrate']?></span></li>
 				<li class="list-group-item">Average Hashrate [24 hrs]		<span class="pull-right"><?=$stat['avghashrate']?> MH/s</span></li>
 			</ul>
@@ -47,7 +47,7 @@
 				</div>
 			</div><br>
 		</div>
-		<?php } ?>	
+		<?php } ?>
 
 		<div class="col-md-3">
 			<ul class="list-group">
@@ -80,7 +80,7 @@
 				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['eweek']*$ethtofiat),2)?></span></li><?php } ?>
 				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['emonth']*$ethtofiat),2)?></span></li><?php } ?>
 			</ul>
-		</div>		
+		</div>
 
 		<div class="col-md-3">
 			<ul class="list-group">
@@ -94,7 +94,7 @@
 		</div>
 
 		<?php if ( $conf['show_power'] == '1' ) { ?>
-		<div class="col-md-4">
+		<div class="col-md-3">
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>Power Costs</h4></li>
 				<?php if ( $conf['show_min'] == '1' ) { ?><li class="list-group-item">Minute<span class="pull-right"><?=$fiat['sym'].number_format($stat['power-min'],2)?></span></li><?php } ?>
@@ -105,7 +105,7 @@
 			</ul>
 		</div>
 
-		<div class="col-md-4">
+		<div class="col-md-3">
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>&Xi;TH Profitability</h4></li>
 				<?php if ( $conf['show_min'] == '1' ) { ?><li class="list-group-item">Minute<span class="pull-right"><?=$fiat['sym'].number_format((($stat['emin']*$ethtofiat)-$stat['power-min']),2)?></span></li><?php } ?>
@@ -116,7 +116,18 @@
 			</ul>
 		</div>
 
-		<div class="col-md-4">
+		<div class="col-md-3">
+			<ul class="list-group">
+				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>&Xi;TH buy-in</h4></li>
+				<?php if ( $conf['show_min'] == '1' ) { ?><li class="list-group-item">Minute<span class="pull-right"><?=$fiat['sym'].number_format(($stat['power-min']/$stat['emin']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour<span class="pull-right"><?=$fiat['sym'].number_format(($stat['power-hour']/$stat['ehour']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day<span class="pull-right"><?=$fiat['sym'].number_format(($stat['power-day']/$stat['eday']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week<span class="pull-right"><?=$fiat['sym'].number_format(($stat['power-week']/$stat['eweek']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month<span class="pull-right"><?=$fiat['sym'].number_format(($stat['power-month']/$stat['emonth']),2)?></span></li><?php } ?>
+			</ul>
+		</div>
+
+		<div class="col-md-3">
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>฿TC Profitability</h4></li>
 				<?php if ( $conf['show_min'] == '1' ) { ?><li class="list-group-item">Minute<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bmin']*$btctofiat)-$stat['power-min']),2)?></span></li><?php } ?>
