@@ -49,7 +49,7 @@ function core_calc_remaining($fin) {
 	$hours = gmdate('G', floor($fin * 3600));
 	$minutes = gmdate('i', floor($fin * 3600));
 	// $seconds = gmdate('s', floor($fin * 3600));
-	
+
 	$output = '';
 	if ( $days != '0' ) { if ( $days != '1' ) { $p = ' days'; } else { $p = ' day'; } $output = $output.$days.$p; }
 	if ( $hours != '0' ) { if ( $hours != '1' ) { $p = ' hrs'; } else { $p = ' hr'; } $output = $output.' '.$hours.$p; }
@@ -76,7 +76,7 @@ function core_get_transactions($fin) {
 	$graphtime = array();
 	$grapheth = array();
 	$merged = array();
-	
+
 	foreach ($data as &$val) {
 		$obj = explode(',', $val);
 		$otime = str_replace('time:', '', str_replace('"', '', $obj[8]));
@@ -89,7 +89,7 @@ function core_get_transactions($fin) {
 		}
 	}
 	sort($merged);
-	
+
 	foreach ($merged as &$val) {
 		$obj = explode(',', $val);
 		$graphtime[] = $obj[0];
@@ -97,6 +97,47 @@ function core_get_transactions($fin) {
 	}
 }
 
+function jsonAPI($url) {
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+	curl_setopt($ch, CURLOPT_URL, $url);
+	$result = curl_exec($ch);
+	curl_close($ch);
+	return json_decode($result, true);
+}
+
+function getStats() {
+	global $conf;
+
+	if ($conf['pool'] == 'ethermine') {
+		return jsonAPI('https://ethermine.org/api/miner_new/'.$conf['wallet']);
+	} elseif ($conf['pool'] == 'nanopool') {
+		// Not Ethermine, lets pluck out what we need
+		$tmp = jsonAPI('https://api.nanopool.org/v1/eth/user/'.$conf['wallet']);
+		$obj['hashRate'] = $tmp['data']['hashrate'].' MH/s';
+		$obj['avgHashrate'] = ($tmp['data']['avgHashrate']['h12']);
+		$obj['reportedHashRate'] = 0; //Cant get this without another API call - dont see the need to waste time on it just yet
+		$obj['settings']['minPayout'] = $conf['min_payout']; //Not available via API, see config file
+		$obj['unpaid'] = $tmp['data']['balance'];
+		// Get calculator values based on avg hash rate
+		$tmp = jsonAPI('https://api.nanopool.org/v1/eth/approximated_earnings/'.$obj['avgHashrate']);
+
+		$obj['ethPerMin'] = $tmp['data']['minute']['coins'];
+		$obj['btcPerMin'] = $tmp['data']['minute']['bitcoins'];
+		$obj['usdPerMin'] = $tmp['data']['minute']['dollars'];
+
+		// Value transformations
+		$obj['avgHashrate'] = ($obj['avgHashrate'] * 1000000);
+		$obj['unpaid'] = (($obj['unpaid'] * 10) * 100000000000000000);
+		$obj['settings']['minPayout'] = (($obj['settings']['minPayout'] * 10) * 100000000000000000);
+
+		return $obj;
+	} else {
+		die('Unknown pool');
+	}
+}
 
 // handles base FIAT logic
 if     ( strtoupper($conf['fiat']) == 'USD' ) { $fiat = array( 'code' => 'USD', 'sym' => '$' ); }
@@ -104,16 +145,8 @@ elseif ( strtoupper($conf['fiat']) == 'GBP' ) { $fiat = array( 'code' => 'GBP', 
 elseif ( strtoupper($conf['fiat']) == 'EUR' ) { $fiat = array( 'code' => 'EUR', 'sym' => '&euro;' ); }
 
 
-// get stats from ethermine
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 4);
-curl_setopt($ch, CURLOPT_URL, 'https://ethermine.org/api/miner_new/'.$conf['wallet']);
-$result = curl_exec($ch);
-curl_close($ch);
-$obj = json_decode($result, true);
-
+// get stats from pool
+$obj = getStats();
 
 // creates a local cache file, in the event that the ethermine api limit is reached
 if ( is_null($obj) ) {
@@ -128,24 +161,12 @@ if ( is_null($obj) ) {
 
 
 // gets crypto exchange rate for ETH using cryptonator.com/api
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_URL, 'https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
-$result = curl_exec($ch);
-curl_close($ch);
-$efi = json_decode($result, true);
+$efi = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
 $ethtofiat = $efi['ticker']['price'];
 
 
 // gets crypto exchange rate for BTC using cryptonator.com/api
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_URL, 'https://api.cryptonator.com/api/ticker/btc-'.strtolower($conf['fiat']));
-$result = curl_exec($ch);
-curl_close($ch);
-$bfi = json_decode($result, true);
+$bfi = jsonAPI('https://api.cryptonator.com/api/ticker/btc-'.strtolower($conf['fiat']));
 $btctofiat = $bfi['ticker']['price'];
 
 
@@ -159,7 +180,7 @@ $stat['eday'] = $stat['ehour']*24;
 $stat['eweek'] = $stat['eday']*7;
 $stat['emonth'] = ( $stat['eweek']*52 )/12;
 
-if ( $stat['ehour'] != '0' ) { 
+if ( $stat['ehour'] != '0' ) {
 
 	$stat['bmin'] = $obj['btcPerMin'];
 	$stat['bhour'] = $stat['bmin']*60;
@@ -174,7 +195,6 @@ if ( $stat['ehour'] != '0' ) {
 	$stat['umonth'] = ( $stat['uweek']*52 )/12;
 
 	$stat['unpaid'] = number_format((($obj['unpaid']/10)/100000000000000000),5);
-
 	$stat['eneeded'] = ($stat['payout'])-($obj['unpaid']/1000000000000000000) ;
 	$stat['hoursuntil'] = $stat['eneeded'] / $stat['ehour'];
 

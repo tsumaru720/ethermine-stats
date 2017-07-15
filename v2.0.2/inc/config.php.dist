@@ -4,6 +4,16 @@
 // --- REQUIRED SETTINGS ---
 // -------------------------
 
+// --- Pool Name --
+// Seupports ethermine (default) and nanopool
+ $conf['pool'] = 'ethermine';
+
+// --- Nanopool Only ---
+// Minimum payout settings are not available via API
+// Set yours here
+        $conf['min_payout'] = '0.2'; //NANOPOOL ONLY
+
+
 // --- Encryption key for URLS ---
 // Used to mask links and other private data configured within miner stats
 // Set this to a random string of at least 20 characters
@@ -11,9 +21,8 @@
 
 
 // --- Wallet/Account Address ---
-// Used to pull stats from ethermine, as well as the etherium blockchain
+// Used to pull stats from our chosen pool, as well as the etherium blockchain
 // This is the same as "<Your_Ethereum_Address>" when configuring your miner
-// on ethermine.org
 	$conf['wallet'] = '70d37408c284178565c8091356684cb87d55f2f4';
 
 
@@ -25,7 +34,7 @@
 
 
 // --- Cache File ---
-// In the event that the Ethermine API returns no data, a local cache file
+// In the event that the Pool API returns no data, a local cache file
 // is created and used.  No data is returned from the API query when there
 // are too many requests being made.  Specify what you'd like your cache 
 // file to be called.  This file will be readable from your webserver, so
@@ -84,7 +93,7 @@
 
 // --- Show Hashrate ---
 // Some miners (qtminer, ethminer etc) don't correctly "report" a hashrate to
-// to ethermine.org.  Check your stats via ethermine.org, if there is no 
+// to our pool.  Check your stats via the pool, if there is no 
 // figure shown for "Reported Hashrate", then set this to 0. Setting this to
 // 0 will replace the "Reported Hashrate" section on the dashboard with the
 // value of ETH mined so far on the job cycle.

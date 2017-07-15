@@ -141,7 +141,7 @@
 
 		<div class="col-md-12">
 			<ul class="list-group">
-				<?php if ( $cache == '1' ) { ?><li class="list-group-item list-group-item-warning">Using Cached Data: Too many requests to the Ethermine API</li><?php } ?>
+				<?php if ( $cache == '1' ) { ?><li class="list-group-item list-group-item-warning">Using Cached Data: Too many requests to the pool API</li><?php } ?>
 			</ul>
 		</div>
 
