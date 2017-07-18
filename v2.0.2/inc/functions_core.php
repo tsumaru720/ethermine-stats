@@ -116,6 +116,8 @@ function getStats() {
 	} elseif ($conf['pool'] == 'nanopool') {
 		// Not Ethermine, lets pluck out what we need
 		$tmp = jsonAPI('https://api.nanopool.org/v1/eth/user/'.$conf['wallet']);
+                if (!$tmp) { return false; }
+
 		$obj['hashRate'] = $tmp['data']['hashrate'].' MH/s';
 		$obj['avgHashrate'] = ($tmp['data']['avgHashrate']['h24']);
 		$obj['reportedHashRate'] = 0; //Cant get this without another API call - dont see the need to waste time on it just yet
