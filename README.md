@@ -6,8 +6,6 @@ Turn your stats from ethermine or nanopool into a responsive, beautiful and simp
 dashboard.  Upload to your web server, edit the config file, and you're ready 
 to go.
 
-Example: https://mine.hamlesh.com
-
 
 # Why?
 As much as we all love Ethermine and nanopool, the default mining performance view leaves 
@@ -16,8 +14,15 @@ with mobile devices.  Above all, I wanted a way to see/display my mining
 statistics, without having to distribute my wallet address.  Which led to the
 creation of ethermine-stats :)
 
+# Sources / Credits
 
-# Release History
+  - Bootstrap via BootstrapCDN
+  - FontAwesome via BootstrapCDN
+  - jQuery 2.2.3 via jQueryCDN
+  - Exchange rates via cryptonator.com API
+  - @hamlesh for providing original source
+
+# Release History (Legacy from original fork)
 
 ## v2.0.2 - 06/2017
 Removed php short tags, and a few other minor UI tweaks.  Added the ability 
@@ -49,11 +54,3 @@ Version never properly released, and I wasn't following any versioning control.
 I have the original code base somewhere, I'll post it for the sake of posterity.
 The v1 code base won't actually work anymore, due to changes in the Ethermine 
 API.
-
-
-# Sources / Credits
-
-  - Bootstrap via BootstrapCDN
-  - FontAwesome via BootstrapCDN
-  - jQuery 2.2.3 via jQueryCDN
-  - Exchange rates via cryptonator.com API
