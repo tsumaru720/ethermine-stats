@@ -1,5 +1,0 @@
-<?php
-
-// Database related functions
-
-?>
