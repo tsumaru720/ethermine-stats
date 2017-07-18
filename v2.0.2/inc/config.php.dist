@@ -5,7 +5,7 @@
 // -------------------------
 
 // --- Pool Name --
-// Seupports ethermine (default) and nanopool
+// Supports ethermine (default) and nanopool
  $conf['pool'] = 'ethermine';
 
 // --- Nanopool Only ---
