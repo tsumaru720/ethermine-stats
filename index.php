@@ -32,22 +32,24 @@
 
 		<div class="col-md-6">
 			<ul class="list-group">
-				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>Progr&Xi;ss <span class="pull-right"><?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%</span></h4></li>
+				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>Progr&Xi;ss
+					<span class="pull-right col-md-8 text-right">
+					<?php if ( $conf['show_bar'] == '1' ) { ?>
+						<div class="progress">
+							<div class="progress-bar progress-bar-striped progress-bar-<?=$conf['colour']?> active" role="progressbar" aria-valuenow="<?=$stat['unpaid']?>" aria-valuemin="0" aria-valuemax="100" style="width:<?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%">
+								<p><?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%</p>
+							</div>
+						</div>
+					<?php } else {
+						echo number_format(($stat['unpaid']/$stat['payout'])*100).'%';
+					} ?>
+					</span>
+				</h4></li>
 				<li class="list-group-item">Remaining 	<span class="pull-right">&Xi;<?=number_format($stat['eneeded'],5)?></span></li>
 				<li class="list-group-item">Time Left	<span class="pull-right"><?=core_calc_remaining($stat['hoursuntil'])?></span></li>
 				<li class="list-group-item">Next Payout	<span class="pull-right"><?=$stat['paytime']?></span></li>
 			</ul>
 		</div>
-
-		<?php if ( $conf['show_bar'] == '1' ) { ?>
-		<div class="col-md-12">
-			<div class="progress">
-			  	<div class="progress-bar progress-bar-striped progress-bar-<?=$conf['colour']?> active" role="progressbar" aria-valuenow="<?=$stat['unpaid']?>" aria-valuemin="0" aria-valuemax="100" style="width:<?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%">
-			  		<p><?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%</p>
-				</div>
-			</div>
-		</div>
-		<?php } ?>
 
 		<div class="col-md-3">
 			<ul class="list-group">
