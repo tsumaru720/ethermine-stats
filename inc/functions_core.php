@@ -27,23 +27,6 @@ function core_output_footerscripts() {
 	';
 }
 
-function core_getkey() {
-	include('config.php');
-	return $confkey;
-}
-
-function core_enc($fin) {
-	$key = core_getkey();
-    $enc = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, md5( $key ), $fin, MCRYPT_MODE_CBC, md5( md5( $key ) ) ) );
-    return $enc;
-}
-
-function core_dec($fin) {
-	$key = core_getkey();
-    $dec = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, md5( $key ), base64_decode( $fin ), MCRYPT_MODE_CBC, md5( md5( $key ) ) ), "\0");
-    return $dec;
-}
-
 function core_calc_remaining($fin) {
 	$days = (gmdate('j', floor($fin * 3600)))-1;
 	$hours = gmdate('G', floor($fin * 3600));
