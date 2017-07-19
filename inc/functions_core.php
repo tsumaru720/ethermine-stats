@@ -18,7 +18,7 @@ function core_output_head() {
 	    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	    <![endif]-->
 	    <title>MIN&Xi; ['.rand('11111111','99999999').']</title>
-	    <meta http-equiv="Refresh" content="300">
+	    <meta http-equiv="Refresh" content="'.($conf['cache_period']+5).'">
     ';
 }
 
@@ -132,30 +132,43 @@ elseif ( strtoupper($conf['fiat']) == 'GBP' ) { $fiat = array( 'code' => 'GBP', 
 elseif ( strtoupper($conf['fiat']) == 'EUR' ) { $fiat = array( 'code' => 'EUR', 'sym' => '&euro;' ); }
 
 
-// get stats from pool
-$obj = getStats();
+// Load cache file
+$tmp = file_get_contents($conf['cache_file']);
+$obj = json_decode($tmp, true);
 
-// creates a local cache file, in the event that the ethermine api limit is reached
-if ( is_null($obj) ) {
-	$cache = '1';
-	$tmp = file_get_contents($conf['cache_file']);
-	$obj = json_decode($tmp, true);
-} else {
-	$cache = fopen($conf['cache_file'], 'w');
-	fwrite($cache, json_encode($obj));
-	$cache = '0';
+if (!is_null($obj)) {
+	// Cache file was loaded
+	// Check if its within our cache threshold
+	$cache = 1;
+
+	if ((time() - $obj['cache_time']) >= $conf['cache_period']) {
+		// Cache has expired.
+		$obj = null;
+		$cache = 0;
+	}
 }
 
+if (is_null($obj)) {
+	// Either cache file was blank, or expired
 
-// gets crypto exchange rate for ETH using cryptonator.com/api
-$efi = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
-$ethtofiat = $efi['ticker']['price'];
+	// Get stats from pool
+	$obj = getStats();
 
+	// Get exchange rate for ETH using cryptonator.com API
+	$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
+	$obj['coin_to_fiat'] = $tmp['ticker']['price'];
 
-// gets crypto exchange rate for BTC using cryptonator.com/api
-$bfi = jsonAPI('https://api.cryptonator.com/api/ticker/btc-'.strtolower($conf['fiat']));
-$btctofiat = $bfi['ticker']['price'];
+	// Get exchange rate for BTC using cryptonator.com API
+	$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/btc-'.strtolower($conf['fiat']));
+	$obj['btc_to_fiat'] = $tmp['ticker']['price'];
 
+	$obj['cache_time'] = time();
+
+	// Write to cache
+	$fd = fopen($conf['cache_file'], 'w');
+	fwrite($fd, json_encode($obj));
+
+}
 
 $stat['hashrate'] = $obj['hashRate'];
 $stat['avghashrate'] = number_format( round( $obj['avgHashrate']/1000000, 2),1 );
@@ -197,19 +210,7 @@ if ( $stat['ehour'] != '0' ) {
 		$stat['power-hour'] = $stat['power-day']/24;
 		$stat['power-min'] = $stat['power-hour']/60;
 
-		// Profit values - What we mine vs what it costs us for electricity
-		//ETH
-		// $stat['epmin'] = ($stat['emin'] * $ethtofiat) - $kwh['cost_min'];
-		$stat['ehourp'] = ($stat['ehour']*$ethtofiat) - $stat['power-hour'];
-		// $stat['epday'] = ($stat['eday'] * $ethtofiat) - $kwh['cost_day'];
-		// $stat['epweek'] = ($stat['eweek'] * $ethtofiat) - $kwh['cost_week'];
-		// $stat['epmonth'] = ($stat['emonth'] * $ethtofiat) - $kwh['cost_month'];
-		// //BTC
-		// $stat['bpmin'] = ($stat['bmin'] * $btctofiat) - $kwh['cost_min'];
-		// $stat['bphour'] = ($stat['bhour'] * $btctofiat) - $kwh['cost_hour'];
-		// $stat['bpday'] = ($stat['bday'] * $btctofiat) - $kwh['cost_day'];
-		// $stat['bpweek'] = ($stat['bweek'] * $btctofiat) - $kwh['cost_week'];
-		// $stat['bpmonth'] = ($stat['bmonth'] * $btctofiat) - $kwh['cost_month'];
+		$stat['ehourp'] = ($stat['ehour']*$obj['coin_to_fiat']) - $stat['power-hour'];
 
 	}
 

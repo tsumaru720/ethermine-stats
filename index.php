@@ -24,7 +24,7 @@
 
 		<div class="col-md-6">
 			<ul class="list-group">
-				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>Statistics<span class="pull-right">ETH:<?=$fiat['code'].'['.number_format($ethtofiat,2)?>]</span></h4></li>
+				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>Statistics<span class="pull-right">ETH:<?=$fiat['code'].'['.number_format($obj['coin_to_fiat'],2)?>]</span></h4></li>
 				<li class="list-group-item">
 					<?php if ( $conf['show_reportedhash'] == '0' ) { ?>Mined<span class="pull-right">&Xi;<?=$stat['unpaid']?></span> <?php } ?>
 					<?php if ( $conf['show_reportedhash'] == '1' ) { ?>Reported Hashrate<span class="pull-right"><?=$stat['reportedhashrate']?> MH/s</span> <?php } ?>
@@ -80,22 +80,22 @@
 		<div class="col-md-3">
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>&Xi;TH &raquo; <?=$fiat['code']?></h4></li>
-				<?php if ( $conf['show_min'] == '1' ) { ?>		<li class="list-group-item">Minute 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['emin']*$ethtofiat),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['ehour']*$ethtofiat),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['eday']*$ethtofiat),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['eweek']*$ethtofiat),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['emonth']*$ethtofiat),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_min'] == '1' ) { ?>		<li class="list-group-item">Minute 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['emin']*$obj['coin_to_fiat']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['ehour']*$obj['coin_to_fiat']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['eday']*$obj['coin_to_fiat']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['eweek']*$obj['coin_to_fiat']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['emonth']*$obj['coin_to_fiat']),2)?></span></li><?php } ?>
 			</ul>
 		</div>
 
 		<div class="col-md-3">
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>฿TC &raquo; <?=$fiat['code']?></h4></li>
-				<?php if ( $conf['show_min'] == '1' ) { ?>		<li class="list-group-item">Minute 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bmin']*$btctofiat),2)?></span></li>	<?php } ?>
-				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bhour']*$btctofiat),2)?></span></li>	<?php } ?>
-				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bday']*$btctofiat),2)?></span></li>	<?php } ?>
-				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bweek']*$btctofiat),2)?></span></li>	<?php } ?>
-				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bmonth']*$btctofiat),2)?></span></li>	<?php } ?>
+				<?php if ( $conf['show_min'] == '1' ) { ?>		<li class="list-group-item">Minute 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bmin']*$obj['btc_to_fiat']),2)?></span></li>	<?php } ?>
+				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bhour']*$obj['btc_to_fiat']),2)?></span></li>	<?php } ?>
+				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bday']*$obj['btc_to_fiat']),2)?></span></li>	<?php } ?>
+				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bweek']*$obj['btc_to_fiat']),2)?></span></li>	<?php } ?>
+				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month 	<span class="pull-right"><?=$fiat['sym'].number_format(($stat['bmonth']*$obj['btc_to_fiat']),2)?></span></li>	<?php } ?>
 			</ul>
 		</div>
 
@@ -114,11 +114,11 @@
 		<div class="col-md-3">
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>&Xi;TH Profitability</h4></li>
-				<?php if ( $conf['show_min'] == '1' ) { ?><li class="list-group-item">Minute<span class="pull-right"><?=$fiat['sym'].number_format((($stat['emin']*$ethtofiat)-$stat['power-min']),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour<span class="pull-right"><?=$fiat['sym'].number_format((($stat['ehour']*$ethtofiat)-$stat['power-hour']),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day<span class="pull-right"><?=$fiat['sym'].number_format((($stat['eday']*$ethtofiat)-$stat['power-day']),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week<span class="pull-right"><?=$fiat['sym'].number_format((($stat['eweek']*$ethtofiat)-$stat['power-week']),2)?></li><?php } ?>
-				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month<span class="pull-right"><?=$fiat['sym'].number_format((($stat['emonth']*$ethtofiat)-$stat['power-month']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_min'] == '1' ) { ?><li class="list-group-item">Minute<span class="pull-right"><?=$fiat['sym'].number_format((($stat['emin']*$obj['coin_to_fiat'])-$stat['power-min']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour<span class="pull-right"><?=$fiat['sym'].number_format((($stat['ehour']*$obj['coin_to_fiat'])-$stat['power-hour']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day<span class="pull-right"><?=$fiat['sym'].number_format((($stat['eday']*$obj['coin_to_fiat'])-$stat['power-day']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week<span class="pull-right"><?=$fiat['sym'].number_format((($stat['eweek']*$obj['coin_to_fiat'])-$stat['power-week']),2)?></li><?php } ?>
+				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month<span class="pull-right"><?=$fiat['sym'].number_format((($stat['emonth']*$obj['coin_to_fiat'])-$stat['power-month']),2)?></span></li><?php } ?>
 			</ul>
 		</div>
 
@@ -136,11 +136,11 @@
 		<div class="col-md-3">
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>฿TC Profitability</h4></li>
-				<?php if ( $conf['show_min'] == '1' ) { ?><li class="list-group-item">Minute<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bmin']*$btctofiat)-$stat['power-min']),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bhour']*$btctofiat)-$stat['power-hour']),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bday']*$btctofiat)-$stat['power-day']),2)?></span></li><?php } ?>
-				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bweek']*$btctofiat)-$stat['power-week']),2)?></li><?php } ?>
-				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bmonth']*$btctofiat)-$stat['power-month']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_min'] == '1' ) { ?><li class="list-group-item">Minute<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bmin']*$obj['btc_to_fiat'])-$stat['power-min']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_hour'] == '1' ) { ?>	<li class="list-group-item">Hour<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bhour']*$obj['btc_to_fiat'])-$stat['power-hour']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_day'] == '1' ) { ?>		<li class="list-group-item">Day<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bday']*$obj['btc_to_fiat'])-$stat['power-day']),2)?></span></li><?php } ?>
+				<?php if ( $conf['show_week'] == '1' ) { ?>	<li class="list-group-item">Week<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bweek']*$obj['btc_to_fiat'])-$stat['power-week']),2)?></li><?php } ?>
+				<?php if ( $conf['show_month'] == '1' ) { ?>	<li class="list-group-item">Month<span class="pull-right"><?=$fiat['sym'].number_format((($stat['bmonth']*$obj['btc_to_fiat'])-$stat['power-month']),2)?></span></li><?php } ?>
 			</ul>
 		</div>
 		<?php } ?>

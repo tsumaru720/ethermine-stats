@@ -34,14 +34,16 @@
 
 
 // --- Cache File ---
-// In the event that the Pool API returns no data, a local cache file
-// is created and used.  No data is returned from the API query when there
-// are too many requests being made.  Specify what you'd like your cache 
-// file to be called.  This file will be readable from your webserver, so
-// use a random name to maintain the obscurity of your mining wallet 
-// address.
-	$conf['cache_file'] = 'changeme.tmp';
+// To prevent querying the API for every page load and risk overloading
+// we grab our statistics and then cache for x period of time.
+// This file will be readable from your webserver, so use a random name
+// to maintain the obscurity of your mining wallet address.
+        $conf['cache_file'] = 'ewahmee8Ki.tmp';
 
+// --- Cache period ---
+// How long should we cache for (in seconds)
+// Default: 300 (5 minutes)
+        $conf['cache_period'] = 300;
 
 	
 // -------------------------
