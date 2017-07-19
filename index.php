@@ -45,7 +45,7 @@
 			  	<div class="progress-bar progress-bar-striped progress-bar-<?=$conf['colour']?> active" role="progressbar" aria-valuenow="<?=$stat['unpaid']?>" aria-valuemin="0" aria-valuemax="100" style="width:<?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%">
 			  		<p><?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%</p>
 				</div>
-			</div><br>
+			</div>
 		</div>
 		<?php } ?>
 
