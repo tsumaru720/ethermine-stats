@@ -8,10 +8,14 @@
   <body>
 
 	<div class="container">
-
-		<div class="col-md-12">
-			<h1>MIN&Xi;</h1>
-		</div>
+                <div class="row">
+                        <div class="col-md-4">
+                                <h1>MIN&Xi;</h1>
+                        </div>
+                        <div class="col-md-8">
+                                <?php if ( $cache == '1' ) { ?><div class="alert alert-warning cache">Using Cached Data</div><?php } ?>
+                        </div>
+                </div>
 
 		<?php if ( $stat['waiting'] == '1' ) {
 			echo '<div class="col-md-12"><p align="center"><em>There is insufficient data to produce any useful metrics.<br>Please check your wallet settings in config.php.<br>The pool you are querying may also be limiting API requests - please try later.</em></p></div>';
@@ -140,13 +144,6 @@
 			</ul>
 		</div>
 		<?php } ?>
-
-		<div class="col-md-12">
-			<ul class="list-group">
-				<?php if ( $cache == '1' ) { ?><li class="list-group-item list-group-item-warning">Using Cached Data: Too many requests to the pool API</li><?php } ?>
-			</ul>
-		</div>
-
 	</div>
 
 	<!-- Please leave this footer block in place, so that others can find ethermine-stats -->
