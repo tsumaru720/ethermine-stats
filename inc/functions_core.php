@@ -153,11 +153,11 @@ $obj = getStats();
 // creates a local cache file, in the event that the ethermine api limit is reached
 if ( is_null($obj) ) {
 	$cache = '1';
-	$result = file_get_contents($conf['cache_file']);
-	$obj = json_decode($result, true);
+	$tmp = file_get_contents($conf['cache_file']);
+	$obj = json_decode($tmp, true);
 } else {
 	$cache = fopen($conf['cache_file'], 'w');
-	fwrite($cache, $result);
+	fwrite($cache, json_encode($obj));
 	$cache = '0';
 }
 
