@@ -149,7 +149,7 @@
 	<!-- Please leave this footer block in place, so that others can find ethermine-stats -->
 	<div class="container">
 		<div class="col-md-12 footer">
-			<a href="https://github.com/hamlesh/ethermine-stats" target="_blank" class="pull-right"><i class="fa fa-github"></i> ETHERMINE-STATS</a>
+			<a href="https://github.com/tsumaru720/ethermine-stats" target="_blank" class="pull-right"><i class="fa fa-github"></i> ETHERMINE-STATS</a>
 		</div>
 	</div>
 	<!-- Please leave this footer block in place, so that others can find ethermine-stats -->
