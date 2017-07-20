@@ -37,7 +37,7 @@
 		<div class="col-md-6">
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-<?=$conf['colour']?>"><h4>Progr&Xi;ss
-					<span class="pull-right col-md-8 text-right">
+					<span class="pull-right col-xs-8 text-right">
 					<?php if ( $conf['show_bar'] == '1' ) { ?>
 						<div class="progress">
 							<div class="progress-bar progress-bar-striped progress-bar-<?=$conf['colour']?> active" role="progressbar" aria-valuenow="<?=$stat['unpaid']?>" aria-valuemin="0" aria-valuemax="100" style="width:<?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%">
