@@ -170,6 +170,14 @@ if (is_null($obj)) {
 
 			// Update user display message
 			$msg['text'] = 'API seems down - Using cached data';
+
+			// Update Cache timer (to prevent hitting api on page load again...
+			$obj['cache_time'] = time();
+			// Write to cache
+			$fd = fopen($conf['cache_file'], 'w');
+			fwrite($fd, json_encode($obj));
+
+
 		 }
 	} else {
 		// We got stuff back from API
