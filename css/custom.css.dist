@@ -19,3 +19,12 @@ h4 {
 }
 
 .footer a { color: #999; }
+
+.user_message {
+        padding: 5px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        margin-right: 15px;
+        margin-left: 15px;
+        text-align: center;
+}
