@@ -1,4 +1,4 @@
--<?php
+<?php
 
 // Core functions file
 
