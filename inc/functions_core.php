@@ -30,6 +30,8 @@ function core_output_footerscripts() {
 }
 
 function core_calc_remaining($fin) {
+	if ($fin <= 0) { return "&infin;"; }
+
 	$days = (gmdate('j', floor($fin * 3600)))-1;
 	$hours = gmdate('G', floor($fin * 3600));
 	$minutes = gmdate('i', floor($fin * 3600));
@@ -206,7 +208,7 @@ if ( $obj['success'] == true ) {
 	$stat['eneeded'] = ($stat['payout'])-($obj['unpaid']/1000000000000000000) ;
 	$stat['hoursuntil'] = $stat['eneeded'] / $stat['ehour'];
 
-	$stat['paytime'] = date("D d M, H:i:s", time() + ($stat['hoursuntil'] * 3600) );
+	$stat['paytime'] = ($stat['hoursuntil'] <= 0) ? "&infin;" : date("D d M, H:i:s", time() + ($stat['hoursuntil'] * 3600) );
 
 	if ($conf['show_power'] == 1) {
 		// calculates the power costs of mining
