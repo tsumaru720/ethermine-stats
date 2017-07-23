@@ -248,7 +248,7 @@ if ($stat['hashrate'] <= 0) {
 
 	$msg['display'] = true;
 	$msg['type'] = 'danger';
-	$msg['text'] = 'Not currently mining';
+	$msg['text'] = 'Not currently mining / Low hash rate';
 }
 
 if ( $obj['success'] == true ) {
