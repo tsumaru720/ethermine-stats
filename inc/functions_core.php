@@ -1,4 +1,4 @@
-<?php
+-<?php
 
 // Core functions file
 
@@ -187,11 +187,41 @@ if (is_null($obj)) {
 
 		// Get exchange rate for ETH using cryptonator.com API
 		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
-		$obj['coin_to_fiat'] = $tmp['ticker']['price'];
+		if (is_null($tmp)) {
+			// API call failed
+			if (isset($old['coin_to_fiat'])) {
+				$obj['coin_to_fiat'] = $old['coin_to_fiat'];
+				$msg['display'] = true;
+				$msg['type'] = 'warning';
+				$msg['text'] = 'Using cached data for ETH <-> '.strtoupper($conf['fiat']).' value';
+			} else {
+				$obj['coin_to_fiat'] = 0;
+				$msg['display'] = true;
+				$msg['type'] = 'danger';
+				$msg['text'] = "Couldn't get ETH <-> ".strtoupper($conf['fiat']).' value';
+			}
+		} else {
+			$obj['coin_to_fiat'] = $tmp['ticker']['price'];
+		}
 
 		// Get exchange rate for BTC using cryptonator.com API
 		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/btc-'.strtolower($conf['fiat']));
-		$obj['btc_to_fiat'] = $tmp['ticker']['price'];
+		if (is_null($tmp)) {
+			// API call failed
+			if (isset($old['btc_to_fiat'])) {
+				$obj['btc_to_fiat'] = $old['btc_to_fiat'];
+				$msg['display'] = true;
+				$msg['type'] = 'warning';
+				$msg['text'] = 'Using cached data for BTC <-> '.strtoupper($conf['fiat']).' value';
+			} else {
+				$obj['btc_to_fiat'] = 0;
+				$msg['display'] = true;
+				$msg['type'] = 'danger';
+				$msg['text'] = "Couldn't get BTC <-> ".strtoupper($conf['fiat']).' value';
+			}
+		} else {
+			$obj['btc_to_fiat'] = $tmp['ticker']['price'];
+		}
 
 		$obj['cache_time'] = time();
 
