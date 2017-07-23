@@ -17,7 +17,7 @@
                         </div>
                 </div>
 
-		<?php if ( $stat['waiting'] == '1' ) {
+		<?php if ( $obj['success'] == false ) {
 			echo '<div class="col-md-12"><p align="center"><em>There is insufficient data to produce any useful metrics.<br>Please check your wallet settings in config.php.<br>The pool you are querying may also be limiting API requests - please try later.</em></p></div>';
 			die;
 		} ?>

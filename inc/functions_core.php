@@ -97,7 +97,9 @@ function getStats() {
 	global $conf;
 
 	if ($conf['pool'] == 'ethermine') {
-		return jsonAPI('https://ethermine.org/api/miner_new/'.$conf['wallet']);
+		$tmp = jsonAPI('https://ethermine.org/api/miner_new/'.$conf['wallet']);
+		if (!$tmp) { return false; }
+		return $tmp;
 	} elseif ($conf['pool'] == 'nanopool') {
 		// Not Ethermine, lets pluck out what we need
 		$tmp = jsonAPI('https://api.nanopool.org/v1/eth/user/'.$conf['wallet']);
@@ -153,21 +155,27 @@ if (is_null($obj)) {
 
 	// Get stats from pool
 	$obj = getStats();
+	if (!$obj) {
+		// API didnt return anything
+		$obj['success'] = false;
+	} else {
+		// We got stuff back from API
+		$obj['success'] = true;
 
-	// Get exchange rate for ETH using cryptonator.com API
-	$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
-	$obj['coin_to_fiat'] = $tmp['ticker']['price'];
+		// Get exchange rate for ETH using cryptonator.com API
+		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
+		$obj['coin_to_fiat'] = $tmp['ticker']['price'];
 
-	// Get exchange rate for BTC using cryptonator.com API
-	$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/btc-'.strtolower($conf['fiat']));
-	$obj['btc_to_fiat'] = $tmp['ticker']['price'];
+		// Get exchange rate for BTC using cryptonator.com API
+		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/btc-'.strtolower($conf['fiat']));
+		$obj['btc_to_fiat'] = $tmp['ticker']['price'];
 
-	$obj['cache_time'] = time();
+		$obj['cache_time'] = time();
 
-	// Write to cache
-	$fd = fopen($conf['cache_file'], 'w');
-	fwrite($fd, json_encode($obj));
-
+		// Write to cache
+		$fd = fopen($conf['cache_file'], 'w');
+		fwrite($fd, json_encode($obj));
+	}
 }
 
 $stat['hashrate'] = $obj['hashRate'];
@@ -180,7 +188,7 @@ $stat['eday'] = $stat['ehour']*24;
 $stat['eweek'] = $stat['eday']*7;
 $stat['emonth'] = ( $stat['eweek']*52 )/12;
 
-if ( $stat['ehour'] != '0' ) {
+if ( $obj['success'] == true ) {
 
 	$stat['bmin'] = $obj['btcPerMin'];
 	$stat['bhour'] = $stat['bmin']*60;
@@ -214,6 +222,6 @@ if ( $stat['ehour'] != '0' ) {
 
 	}
 
-} else { $stat['waiting'] = 1; }
+}
 
 ?>
