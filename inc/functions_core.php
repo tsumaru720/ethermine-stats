@@ -143,12 +143,14 @@ $obj = json_decode($tmp, true);
 if (!is_null($obj)) {
 	// Cache file was loaded
 	// Check if its within our cache threshold
-	$cache = 1;
+	$msg['display'] = true;
+	$msg['type'] = 'warning';
+	$msg['text'] = 'Using cached data';
 
 	if ((time() - $obj['cache_time']) >= $conf['cache_period']) {
 		// Cache has expired.
+		$old = $obj; // Used in the event of API failure
 		$obj = null;
-		$cache = 0;
 	}
 }
 
@@ -160,9 +162,21 @@ if (is_null($obj)) {
 	if (!$obj) {
 		// API didnt return anything
 		$obj['success'] = false;
+		if (!is_null($old)) {
+			// API is down, but we have cached data so lets use that
+			// This will masquerade as a successful attempt
+			// So that data is displayed, but it will still show as
+			// Being cached data
+			$obj = $old;
+
+			// Update user display message
+			$msg['text'] = 'API seems down - Using cached data';
+		 }
 	} else {
 		// We got stuff back from API
 		$obj['success'] = true;
+		$msg['display'] = false;
+
 
 		// Get exchange rate for ETH using cryptonator.com API
 		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
@@ -180,6 +194,7 @@ if (is_null($obj)) {
 	}
 }
 
+$stat['mining'] = true;
 $stat['hashrate'] = $obj['hashRate'];
 $stat['avghashrate'] = number_format( round( $obj['avgHashrate']/1000000, 2),1 );
 $stat['reportedhashrate'] = number_format( round( $obj['reportedHashRate'], 2),1 );
@@ -189,6 +204,15 @@ $stat['ehour'] = $stat['emin']*60;
 $stat['eday'] = $stat['ehour']*24;
 $stat['eweek'] = $stat['eday']*7;
 $stat['emonth'] = ( $stat['eweek']*52 )/12;
+
+if ($stat['hashrate'] <= 0) {
+	// hash rates are 0 - not mining?
+	$stat['mining'] = false;
+
+	$msg['display'] = true;
+	$msg['type'] = 'danger';
+	$msg['text'] = 'Not currently mining';
+}
 
 if ( $obj['success'] == true ) {
 
@@ -208,7 +232,7 @@ if ( $obj['success'] == true ) {
 	$stat['eneeded'] = ($stat['payout'])-($obj['unpaid']/1000000000000000000) ;
 	$stat['hoursuntil'] = $stat['eneeded'] / $stat['ehour'];
 
-	$stat['paytime'] = ($stat['hoursuntil'] <= 0) ? "&infin;" : date("D d M, H:i:s", time() + ($stat['hoursuntil'] * 3600) );
+	$stat['paytime'] = (!$stat['mining']) ? "&infin;" : date("D d M, H:i:s", time() + ($stat['hoursuntil'] * 3600) );
 
 	if ($conf['show_power'] == 1) {
 		// calculates the power costs of mining
@@ -223,7 +247,10 @@ if ( $obj['success'] == true ) {
 		$stat['ehourp'] = ($stat['ehour']*$obj['coin_to_fiat']) - $stat['power-hour'];
 
 	}
-
+} else {
+	$msg['display'] = true;
+	$msg['type'] = 'warning';
+	$msg['text'] = 'Pool API seems down, try again later';
 }
 
 ?>

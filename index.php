@@ -13,12 +13,12 @@
                                 <h1>MIN&Xi;</h1>
                         </div>
                         <div class="col-md-8">
-                                <?php if ( $cache == '1' ) { ?><div class="alert alert-warning cache">Using Cached Data</div><?php } ?>
+                                <?php if ( $msg['display'] == true ) { ?><div class="alert alert-<?=$msg['type']?> user_message"><?=$msg['text']?></div><?php } ?>
                         </div>
                 </div>
 
 		<?php if ( $obj['success'] == false ) {
-			echo '<div class="col-md-12"><p align="center"><em>There is insufficient data to produce any useful metrics.<br>Please check your wallet settings in config.php.<br>The pool you are querying may also be limiting API requests - please try later.</em></p></div>';
+			echo '<div class="col-md-12"><p align="center"><em>There is no data currently cached to display</em></p></div>';
 			die;
 		} ?>
 
