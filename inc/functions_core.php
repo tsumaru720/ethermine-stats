@@ -4,7 +4,7 @@
 
 
 function core_output_head() {
-	global $conf;
+	global $conf, $cacheExpiry;
 	echo '
 		<meta charset="utf-8">
 	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,7 +17,7 @@ function core_output_head() {
 	    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	    <![endif]-->
 	    <title>MIN&Xi; ['.rand('11111111','99999999').']</title>
-	    <meta http-equiv="Refresh" content="'.($conf['cache_period']+5).'">
+	    <meta http-equiv="Refresh" content="'.($cacheExpiry+5).'">
     ';
 }
 
