@@ -209,8 +209,10 @@ if (is_null($obj)) {
 		// We got stuff back from API
 		$obj['success'] = true;
 		$msg['display'] = false;
-		$obj['lastHash'] = $old['hashRate'];
 
+		// Some pools dont just give us a number.. we should strip the excess
+		$obj['currentHash'] = preg_replace('/[^0-9.]/i', '', $obj['hashRate']);
+		$obj['lastHash'] = $old['currentHash'];
 
 		// Get exchange rate for ETH using cryptonator.com API
 		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
@@ -274,13 +276,15 @@ $stat['eday'] = $stat['ehour']*24;
 $stat['eweek'] = $stat['eday']*7;
 $stat['emonth'] = ( $stat['eweek']*52 )/12;
 
-if (($obj['hashRate'] <= 0) && ($old['hashRate'] <= 0)) {
-	// hash rate is 0 for last 2 polls... not mining?
-	$stat['mining'] = false;
+if (!is_null($obj['lastHash'])) {
+	if (($obj['currentHash'] <= 0) && ($obj['lastHash'] <= 0)) {
+		// hash rate is 0 for last 2 polls... not mining?
+		$stat['mining'] = false;
 
-	$msg['display'] = true;
-	$msg['type'] = 'danger';
-	$msg['text'] = 'Not currently mining / Low hash rate';
+		$msg['display'] = true;
+		$msg['type'] = 'danger';
+		$msg['text'] = 'Not currently mining / Low hash rate';
+	}
 }
 
 if ( $obj['success'] == true ) {
