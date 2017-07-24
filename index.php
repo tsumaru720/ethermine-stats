@@ -40,12 +40,12 @@
 					<span class="pull-right col-xs-8 text-right" style="padding: 0;">
 					<?php if ( $conf['show_bar'] == '1' ) { ?>
 						<div class="progress">
-							<div class="progress-bar progress-bar-striped progress-bar-<?=$conf['colour']?> active" role="progressbar" aria-valuenow="<?=$stat['unpaid']?>" aria-valuemin="0" aria-valuemax="100" style="width:<?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%">
-								<p><?=number_format(($stat['unpaid']/$stat['payout'])*100)?>%</p>
+							<div class="progress-bar progress-bar-striped progress-bar-<?=$conf['colour']?> active" role="progressbar" aria-valuenow="<?=$stat['unpaid']?>" aria-valuemin="0" aria-valuemax="100" style="width:<?=floor(($stat['unpaid']/$stat['payout'])*100)?>%">
+								<p><?=floor(($stat['unpaid']/$stat['payout'])*100)?>%</p>
 							</div>
 						</div>
 					<?php } else {
-						echo number_format(($stat['unpaid']/$stat['payout'])*100).'%';
+						echo floor(($stat['unpaid']/$stat['payout'])*100).'%';
 					} ?>
 					</span>
 				</h4></li>
