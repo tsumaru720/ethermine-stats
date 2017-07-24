@@ -14,6 +14,8 @@
                         </div>
                         <div class="col-md-8">
                                 <?php if ( $msg['display'] == true ) { ?><div class="alert alert-<?=$msg['type']?> user_message"><?=$msg['text']?></div><?php } ?>
+
+							<!-- Next update in <?=duration($cacheExpiry)?> -->
                         </div>
                 </div>
 
