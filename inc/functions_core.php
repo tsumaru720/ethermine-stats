@@ -28,6 +28,30 @@ function core_output_footerscripts() {
 	';
 }
 
+function duration($seconds) {
+	$duration = '';
+	$days = floor($seconds / 86400);
+	$seconds -= $days * 86400;
+	$hours = floor($seconds / 3600);
+	$seconds -= $hours * 3600;
+	$minutes = floor($seconds / 60);
+	$seconds = $seconds - $minutes * 60;
+
+	if($days > 0) {
+		$duration .= $days . ' days';
+	}
+	if($hours > 0) {
+		$duration .= ' ' . $hours . ' hrs';
+	}
+	if($minutes > 0) {
+		$duration .= ' ' . $minutes . ' mins';
+	}
+	if($seconds > 0) {
+		$duration .= ' ' . $seconds . ' secs';
+	}
+	return $duration;
+}
+
 function core_calc_remaining($fin) {
 	if ($fin <= 0) { return "&infin;"; }
 
@@ -142,9 +166,11 @@ $obj = json_decode($tmp, true);
 if (!is_null($obj)) {
 	// Cache file was loaded
 	// Check if its within our cache threshold
+
+	$cacheExpiry = ($obj['cache_time'] + $conf['cache_period']) - time();
 	$msg['display'] = true;
 	$msg['type'] = 'warning';
-	$msg['text'] = 'Using cached data';
+	$msg['text'] = 'Using cached data (Next update in '.duration($cacheExpiry).')';
 
 	if ((time() - $obj['cache_time']) >= $conf['cache_period']) {
 		// Cache has expired.
@@ -168,11 +194,13 @@ if (is_null($obj)) {
 			// Being cached data
 			$obj = $old;
 
-			// Update user display message
-			$msg['text'] = 'API seems down - Using cached data';
-
 			// Update Cache timer (to prevent hitting api on page load again...
 			$obj['cache_time'] = time();
+
+			$cacheExpiry = ($obj['cache_time'] + $conf['cache_period']) - time();
+			// Update user display message
+			$msg['text'] = 'API seems down - Using cached data (Next update in '.duration($cacheExpiry).')';
+
 			// Write to cache
 			$fd = fopen($conf['cache_file'], 'w');
 			fwrite($fd, json_encode($obj));
