@@ -259,6 +259,11 @@ if (is_null($obj)) {
 	}
 }
 
+// cacheExpiry can sometimes be negative depending on when page was loaded
+// <= 0 means we've expired, so set to max
+// This is to fix page-reloading as
+if ($cacheExpiry <= 0) { $cacheExpiry = $conf['cache_period']; }
+
 $stat['mining'] = true;
 $stat['hashrate'] = $obj['hashRate'];
 $stat['avghashrate'] = number_format( round( $obj['avgHashrate']/1000000, 2),1 );
