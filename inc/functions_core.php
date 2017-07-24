@@ -204,13 +204,12 @@ if (is_null($obj)) {
 			// Write to cache
 			$fd = fopen($conf['cache_file'], 'w');
 			fwrite($fd, json_encode($obj));
-
-
 		 }
 	} else {
 		// We got stuff back from API
 		$obj['success'] = true;
 		$msg['display'] = false;
+		$obj['lastHash'] = $old['hashRate'];
 
 
 		// Get exchange rate for ETH using cryptonator.com API
@@ -275,8 +274,8 @@ $stat['eday'] = $stat['ehour']*24;
 $stat['eweek'] = $stat['eday']*7;
 $stat['emonth'] = ( $stat['eweek']*52 )/12;
 
-if ($stat['hashrate'] <= 0) {
-	// hash rates are 0 - not mining?
+if (($obj['hashRate'] <= 0) && ($old['hashRate'] <= 0)) {
+	// hash rate is 0 for last 2 polls... not mining?
 	$stat['mining'] = false;
 
 	$msg['display'] = true;
