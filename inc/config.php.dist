@@ -4,33 +4,32 @@
 // --- REQUIRED SETTINGS ---
 // -------------------------
 
+
 // --- Pool Name --
-// Supports ethermine (default) and nanopool
+// Supports ethermine (default)
  $conf['pool'] = 'ethermine';
-
-// --- Nanopool Only ---
-// Minimum payout settings are not available via API
-// Set yours here
-        $conf['min_payout'] = '0.2'; //NANOPOOL ONLY
-
 
 // --- Encryption key for URLS ---
 // Used to mask links and other private data configured within miner stats
 // Set this to a random string of at least 20 characters
-	$conf['key'] = '86XzjlVmdY4TY8NHLD4';
+	$conf['key'] = '86XzjxVop886Xz567mdY';
 
 
 // --- Wallet/Account Address ---
 // Used to pull stats from our chosen pool, as well as the etherium blockchain
 // This is the same as "<Your_Ethereum_Address>" when configuring your miner
-	$conf['wallet'] = '70d37408c284178565c8091356684cb87d55f2f4';
+	$conf['wallet'] = '0x';
 
+	
+// --- Api etherscan ---
+// your ApiKey from etherscan
+$conf['api'] = 'YourApiKeyToken';
 
 // --- Timezone ---
 // Set this to your timezone, so that "next eth" and other date/time related 
 // statistics are calculated so they are relevant to you.
 // To find your timezone see - http://php.net/manual/en/timezones.php
-	date_default_timezone_set('Europe/London'); 
+	date_default_timezone_set('Europe/Warsaw'); 
 
 
 // --- Cache File ---
@@ -38,12 +37,12 @@
 // we grab our statistics and then cache for x period of time.
 // This file will be readable from your webserver, so use a random name
 // to maintain the obscurity of your mining wallet address.
-        $conf['cache_file'] = 'ewahmee8Ki.tmp';
+        $conf['cache_file'] = 'data.tmp';
 
 // --- Cache period ---
 // How long should we cache for (in seconds)
 // Default: 300 (5 minutes)
-        $conf['cache_period'] = 300;
+        $conf['cache_period'] = 180;
 
 	
 // -------------------------
@@ -51,9 +50,9 @@
 // -------------------------
 
 // Set the base FIAT currency (ISO 4217) you are interested in.  Currently 
-// I have only created support for USD, EUR and GBP.  If you want others 
+// I have only created support for USD, EUR and PLN.  If you want others 
 // adding let me know.
-	$conf['fiat'] = 'gbp';
+	$conf['fiat'] = 'PLN';
 
 // Set the colour scheme of all elements using the bootstrap utility
 // standards (info = blue, success = green, warning = yellow, danger = red).
@@ -68,11 +67,11 @@
 	// What is the average power consumption of your mining rig in watts?
 	// If you have more than one rig, and assuming they are on the same
 	// supply, paying the same kWh rate, simply combine the power values.
-	$conf['watts'] = '600';
+	$conf['watts'] = '650';
 
 	// How much do you pay per kWh?  This will usually be in the lowest
 	// common denominator for your base currency.
-	$conf['kwh_rate'] = '0.13901';
+	$conf['kwh_rate'] = '0.30';
 
 
 // --- Display Settings ---

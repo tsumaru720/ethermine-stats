@@ -1,19 +1,3 @@
-# ethermine-stats
-This project is called "ethermine-stats" because it was originally developed
-to support only ethermine. It has since been expanded to support Nanopool.
-
-Turn your stats from ethermine or nanopool into a responsive, beautiful and simple 
-dashboard.  Upload to your web server, edit the config file, and you're ready 
-to go.
-
-
-# Why?
-As much as we all love Ethermine and nanopool, the default mining performance view leaves 
-a lot to be desired.  It isn't fully responsive, so doesn't always play well 
-with mobile devices.  Above all, I wanted a way to see/display my mining 
-statistics, without having to distribute my wallet address.  Which led to the
-creation of ethermine-stats :)
-
 # Sources / Credits
 
   - Bootstrap via BootstrapCDN
@@ -23,6 +7,10 @@ creation of ethermine-stats :)
   - @hamlesh for providing original source
 
 # Release History (Legacy from original fork)
+## v2.0.3 - 06/2017
+- Now working with new Ethermine Api
+- Added workers
+- forked from tsumaru720/ethermine-stats
 
 ## v2.0.2 - 06/2017
 Removed php short tags, and a few other minor UI tweaks.  Added the ability 

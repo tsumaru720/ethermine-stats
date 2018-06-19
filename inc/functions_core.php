@@ -2,7 +2,6 @@
 
 // Core functions file
 
-
 function core_output_head() {
 	global $conf, $cacheExpiry;
 	echo '
@@ -44,6 +43,7 @@ function duration($seconds) {
 	if($hours > 0) {
 		$duration .= ' ' . $hours . ' hrs';
 	}
+
 	if($minutes > 0) {
 		$duration .= ' ' . $minutes . ' mins';
 	}
@@ -51,6 +51,44 @@ function duration($seconds) {
 		$duration .= ' ' . $seconds . ' secs';
 	}
 	return $duration;
+}
+
+function durationLong($seconds) {
+	$duration = '';
+	$days = floor($seconds / 86400);
+	$seconds -= $days * 86400;
+	$hours = floor($seconds / 3600);
+	$seconds -= $hours * 3600;
+	
+	if($days > 0) {
+		$duration .= $days . ' days';
+	}
+	if($hours > 0) {
+		$duration .= ' ' . $hours . ' hrs';
+	}
+	return $duration;
+}
+
+function subval_sort($a,$subkey) {
+    foreach($a as $k=>$v) {
+        $b[$k] = strtolower($v[$subkey]);
+    }
+    natsort($b);
+    foreach($b as $key=>$val) {
+        $c[$key] = $a[$key];
+    }
+    return $c;
+}
+
+function jsonAPI($url) {
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+	curl_setopt($ch, CURLOPT_URL, $url);
+	$result = curl_exec($ch);
+	curl_close($ch);
+	return json_decode($result, true);
 }
 
 function core_calc_remaining($fin) {
@@ -70,99 +108,111 @@ function core_calc_remaining($fin) {
 	return $output;
 }
 
+function core_get_transactions() {
+	global $conf;
 
-function core_get_transactions($fin) {
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_URL, 'https://etherchain.org/api/account/'.$fin.'/tx/0');
-	$result = curl_exec($ch);
-	curl_close($ch);
-	$data = (array) $result;
-
-	$data = explode('[{', $result);
-	$data = (string) $data[1];
-	$data = explode('},{', $data);
-
-	$graphtime = array();
-	$grapheth = array();
-	$merged = array();
-
-	foreach ($data as &$val) {
-		$obj = explode(',', $val);
-		$otime = str_replace('time:', '', str_replace('"', '', $obj[8]));
-		$osender = str_replace('sender:', '', str_replace('"', '', $obj[1]));
-		$oeth = str_replace('amount:', '', str_replace('"', '', $obj[6]));
-		$oeth = number_format(($oeth/1000000000000000000),5);
-
-		if ( $osender != $fin ) {
-			$merged[] = substr($otime, 0, strpos($otime, "T")).','.$oeth;
-		}
-	}
-	sort($merged);
-
-	foreach ($merged as &$val) {
-		$obj = explode(',', $val);
-		$graphtime[] = $obj[0];
-		$grapheth[] = $obj[1];
+	if ($conf['api'] != '') {
+		$tmp = jsonAPI('http://api.etherscan.io/api?module=account&action=txlist&address='.$conf['wallet'].'&startblock=0&endblock=99999999&sort=asc&apikey='.$conf['api']);
+		if (!$tmp) { return false; }
+		$tmp = $tmp['result'];
+        $sorttime = array();
+        foreach ($tmp as &$val) {
+		$otime = $val['timeStamp'];
+		$osender = $val['from'];
+        if (strtoupper($conf['wallet']) == strtoupper($osender)){
+            $sorttime[] = $otime;
+         }
+	}	
+	if ($sorttime != null){
+		rsort($sorttime);
+        $lasttx = time()-$sorttime[0];
+		return durationLong($lasttx);
+	} else {
+	return "No output transaction";
 	}
 }
-
-function jsonAPI($url) {
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_TIMEOUT, 4);
-	curl_setopt($ch, CURLOPT_URL, $url);
-	$result = curl_exec($ch);
-	curl_close($ch);
-	return json_decode($result, true);
 }
+
 
 function getStats() {
 	global $conf;
 
 	if ($conf['pool'] == 'ethermine') {
-		$tmp = jsonAPI('https://ethermine.org/api/miner_new/'.$conf['wallet']);
+		$tmp = jsonAPI('https://api.ethermine.org/miner/'.$conf['wallet'].'/currentStats');
+		
 		if (!$tmp) { return false; }
-		return $tmp;
-	} elseif ($conf['pool'] == 'nanopool') {
-		// Not Ethermine, lets pluck out what we need
-		$tmp = jsonAPI('https://api.nanopool.org/v1/eth/user/'.$conf['wallet']);
-                if (!$tmp) { return false; }
-
-		$obj['hashRate'] = $tmp['data']['hashrate'].' MH/s';
-		$obj['avgHashrate'] = ($tmp['data']['avgHashrate']['h24']);
-		$obj['reportedHashRate'] = 0; //Cant get this without another API call - dont see the need to waste time on it just yet
-		$obj['settings']['minPayout'] = $conf['min_payout']; //Not available via API, see config file
-		$obj['unpaid'] = $tmp['data']['balance'];
-		// Get calculator values based on avg hash rate
-		$tmp = jsonAPI('https://api.nanopool.org/v1/eth/approximated_earnings/'.$obj['avgHashrate']);
-
-		$obj['ethPerMin'] = $tmp['data']['minute']['coins'];
-		$obj['btcPerMin'] = $tmp['data']['minute']['bitcoins'];
-		$obj['usdPerMin'] = $tmp['data']['minute']['dollars'];
-
-		// Value transformations
-		$obj['avgHashrate'] = ($obj['avgHashrate'] * 1000000);
-		$obj['unpaid'] = (($obj['unpaid'] * 10) * 100000000000000000);
-		$obj['settings']['minPayout'] = (($obj['settings']['minPayout'] * 10) * 100000000000000000);
-
-		return $obj;
+		return $tmp['data'];
 	} else {
-		die('Unknown pool');
+		die('Stats error');
 	}
 }
 
+function getDashboard() {
+	global $conf;
+
+	if ($conf['pool'] == 'ethermine') {
+		$tmp = jsonAPI('https://api.ethermine.org/miner/'.$conf['wallet'].'/dashboard');
+		if (!$tmp) { return false; }
+		$curstat = $tmp['data']['currentStatistics'];
+		$cursett = $tmp['data']['settings'];
+		$tmp = array_merge($curstat, $cursett);
+		return $tmp;
+	} else {
+		die('Dashboard error');
+	}
+}
+
+function getWorkers() {
+	global $conf;
+
+	if ($conf['pool'] == 'ethermine') {
+		$tmp = jsonAPI('https://api.ethermine.org/miner/'.$conf['wallet'].'/workers');
+		if (!$tmp) { return false; }
+		$tmp['data'] = subval_sort($tmp['data'],'worker');
+		return $tmp['data'];
+		
+	} else {
+		die('Worker Error');
+	}
+}
+
+function getBalance() {
+	global $conf;
+
+	if ($conf['api'] != '') {
+		$tmp = jsonAPI('https://api.etherscan.io/api?module=account&action=balance&address='.$conf['wallet'].'&tag=latest&apikey='.$conf['api']);
+		
+		if (!$tmp) { return false; }
+		return $tmp['result']/1000000000000000000;
+	} else {
+		die('Balance Error');
+	}
+}
+
+
 // handles base FIAT logic
 if     ( strtoupper($conf['fiat']) == 'USD' ) { $fiat = array( 'code' => 'USD', 'sym' => '$' ); }
-elseif ( strtoupper($conf['fiat']) == 'GBP' ) { $fiat = array( 'code' => 'GBP', 'sym' => '&pound;' ); }
+elseif ( strtoupper($conf['fiat']) == 'PLN' ) { $fiat = array( 'code' => 'PLN', 'sym' => ' PLN' ); }
 elseif ( strtoupper($conf['fiat']) == 'EUR' ) { $fiat = array( 'code' => 'EUR', 'sym' => '&euro;' ); }
 
 
 // Load cache file
+
+
+
+if (!file_exists($conf['cache_file'])){
+$fh = fopen($conf['cache_file'], 'w') or die("Can't create file");
+    $obj['success'] = null;
+    $obj['currentHash'] = null;
+    $obj['lastHash'] = null;
+    $obj['coin_to_fiat'] = null;
+    $obj['eth_to_usd'] = null;
+    $obj['cache_time'] = null;
+} else {
 $tmp = file_get_contents($conf['cache_file']);
 $obj = json_decode($tmp, true);
+}
+
 
 if (!is_null($obj)) {
 	// Cache file was loaded
@@ -179,13 +229,13 @@ if (!is_null($obj)) {
 		$obj = null;
 	}
 }
-
 if (is_null($obj)) {
 	// Either cache file was blank, or expired
 
 	// Get stats from pool
 	$obj = getStats();
-	if (!$obj) {
+    
+    if (!$obj) {
 		// API didnt return anything
 		$obj['success'] = false;
 		if (!is_null($old)) {
@@ -210,13 +260,14 @@ if (is_null($obj)) {
 		// We got stuff back from API
 		$obj['success'] = true;
 		$msg['display'] = false;
-
+		
 		// Some pools dont just give us a number.. we should strip the excess
-		$obj['currentHash'] = preg_replace('/[^0-9.]/i', '', $obj['hashRate']);
+		$obj['currentHash'] = number_format( round( $obj['currentHashrate']/1000000, 2),1 );
 		$obj['lastHash'] = $old['currentHash'];
 
 		// Get exchange rate for ETH using cryptonator.com API
 		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/eth-'.strtolower($conf['fiat']));
+
 		if (is_null($tmp)) {
 			// API call failed
 			if (isset($old['coin_to_fiat'])) {
@@ -232,29 +283,48 @@ if (is_null($obj)) {
 			}
 		} else {
 			$obj['coin_to_fiat'] = $tmp['ticker']['price'];
-		}
+        }
 
-		// Get exchange rate for BTC using cryptonator.com API
-		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/btc-'.strtolower($conf['fiat']));
+		// Get price for ETH using cryptonator.com API
+		$tmp = jsonAPI('https://api.cryptonator.com/api/ticker/eth-usd');
 		if (is_null($tmp)) {
 			// API call failed
-			if (isset($old['btc_to_fiat'])) {
-				$obj['btc_to_fiat'] = $old['btc_to_fiat'];
+			if (isset($old['eth_to_usd'])) {
+				$obj['eth_to_usd'] = $old['eth_to_usd'];
 				$msg['display'] = true;
 				$msg['type'] = 'warning';
-				$msg['text'] = 'Using cached data for BTC <-> '.strtoupper($conf['fiat']).' value';
+				$msg['text'] = 'Using cached data for ETH <-> USD';
 			} else {
-				$obj['btc_to_fiat'] = 0;
+				$obj['eth_to_usd'] = 0;
 				$msg['display'] = true;
 				$msg['type'] = 'danger';
-				$msg['text'] = "Couldn't get BTC <-> ".strtoupper($conf['fiat']).' value';
+				$msg['text'] = "Couldn't get ETH <-> USD";
 			}
 		} else {
-			$obj['btc_to_fiat'] = $tmp['ticker']['price'];
+			$obj['eth_to_usd'] = $tmp['ticker']['price'];
+		}
+		
+		$obj['balance'] = getBalance();
+		
+		if (is_null($obj['balance'])) {
+			// API call failed
+			if (isset($old['balance'])) {
+				$obj['balance'] = $old['balance'];
+				$msg['display'] = true;
+				$msg['type'] = 'warning';
+				$msg['text'] = 'Using cached data for balance';
+			} else {
+				$obj['balance'] = 0;
+				$msg['display'] = true;
+				$msg['type'] = 'danger';
+				$msg['text'] = "Couldn't get balance";
+			}
 		}
 
-		$obj['cache_time'] = time();
-
+		$obj['cache_time'] = time();		
+        $obj['dashboard'] = getDashboard();
+        $obj['lastouttx'] = core_get_transactions();
+        $obj['workers'] = getWorkers();
 		// Write to cache
 		$fd = fopen($conf['cache_file'], 'w');
 		fwrite($fd, json_encode($obj));
@@ -267,16 +337,21 @@ if (is_null($obj)) {
 if ($cacheExpiry <= 0) { $cacheExpiry = $conf['cache_period']; }
 
 $stat['mining'] = true;
-$stat['hashrate'] = $obj['hashRate'];
-$stat['avghashrate'] = number_format( round( $obj['avgHashrate']/1000000, 2),1 );
-$stat['reportedhashrate'] = number_format( round( $obj['reportedHashRate'], 2),1 );
-$stat['payout'] = ($obj['settings']['minPayout']/1000000000000000000);
-$stat['emin'] = $obj['ethPerMin'];
+$stat['activeworkers'] = $obj['activeWorkers'];
+$stat['hashrate'] = number_format( round( $obj['currentHashrate']/1000000, 2),1 );
+$stat['avghashrate'] = number_format( round( $obj['averageHashrate']/1000000, 2),1 );
+$stat['reportedhashrate'] = number_format( round( $obj['reportedHashrate']/1000000, 2),1 );
+$stat['payout'] = ($obj['dashboard']['minPayout']/1000000000000000000);
+$stat['emin'] = $obj['coinsPerMin'];
 $stat['ehour'] = $stat['emin']*60;
 $stat['eday'] = $stat['ehour']*24;
 $stat['eweek'] = $stat['eday']*7;
 $stat['emonth'] = ( $stat['eweek']*52 )/12;
-
+if (($obj['lastouttx'] == false) && isset($old['lastouttx'])){
+$stat['lastouttx'] = $old['lastouttx'];
+} else {
+$stat['lastouttx'] = $obj['lastouttx'];
+}
 if (!is_null($obj['lastHash'])) {
 	if (($obj['currentHash'] <= 0) && ($obj['lastHash'] <= 0)) {
 		// hash rate is 0 for last 2 polls... not mining?
@@ -310,7 +385,7 @@ if ( $obj['success'] == true ) {
 
 	if ($conf['show_power'] == 1) {
 		// calculates the power costs of mining
-		$stat['power-consumed'] = ($conf['watts']/1000)*8766; //8766 hours in 1 year
+		$stat['power-consumed'] = (($conf['watts']/1000)*8766)*$stat['activeworkers']; //8766 hours in 1 year
 		$stat['power-annual'] = $stat['power-consumed']*$conf['kwh_rate'];
 		$stat['power-month'] = $stat['power-annual']/12;
 		$stat['power-week'] = $stat['power-annual']/52;
@@ -325,6 +400,12 @@ if ( $obj['success'] == true ) {
 	$msg['display'] = true;
 	$msg['type'] = 'warning';
 	$msg['text'] = 'Pool API seems down, try again later';
+}
+if (!$obj['workers']) {
+    $msg['display'] = true;
+	$msg['type'] = 'warning';
+	$msg['text'] = "Workers can't be loaded";
+	
 }
 
 ?>
